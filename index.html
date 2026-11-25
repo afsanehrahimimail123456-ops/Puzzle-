@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>پاسخ معماها</title>
+  <style>
+    body {
+      font-family: Tahoma, sans-serif;
+      background: #f6f7fb;
+      color: #1f2937;
+      margin: 0;
+      padding: 24px;
+      line-height: 1.8;
+    }
+    .card {
+      max-width: 720px;
+      margin: 0 auto;
+      background: #ffffff;
+      border-radius: 14px;
+      padding: 24px;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.06);
+    }
+    h1 {
+      margin-top: 0;
+      font-size: 1.35rem;
+      color: #111827;
+      border-bottom: 1px solid #e5e7eb;
+      padding-bottom: 12px;
+    }
+    button {
+      background: #2563eb;
+      color: #fff;
+      border: none;
+      padding: 10px 18px;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      cursor: pointer;
+      margin-bottom: 16px;
+    }
+    button:hover {
+      background: #1d4ed8;
+    }
+    .answer-box {
+      display: none;
+      background: #f9fafb;
+      border: 1px solid #e5e7eb;
+      border-radius: 10px;
+      padding: 16px;
+      white-space: pre-line;
+    }
+    .answer-box.show {
+      display: block;
+    }
+    .nav {
+      margin-top: 20px;
+      font-size: 0.9rem;
+      color: #6b7280;
+    }
+    .nav a {
+      color: #2563eb;
+      text-decoration: none;
+      margin-left: 12px;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1 id="puzzle-title">در حال بارگذاری...</h1>
+    <button id="toggle-btn" onclick="toggleAnswer()">نمایش جواب</button>
+    <div id="puzzle-answer" class="answer-box"></div>
+    <div id="puzzle-nav" class="nav"></div>
+  </div>
+
+  <script>
+    const puzzles = {
+      1: {
+        title: "زندگی دانشجویی در خوابگاه",
+        answer: `این معما در شکل فعلی دو پاسخ ممکن دارد و جواب یکتا نیست.
+
+نام | زبان | ورزش | رشته
+دنیل | آلمانی | فوتبال | فیزیک
+جورج | ایتالیایی یا ژاپنی | جودو | فناوری اطلاعات
+ایتن | اسپانیایی | والیبال | جامعه‌شناسی
+ویکتور | ژاپنی یا ایتالیایی | دوچرخه‌سواری | ریاضیات
+اسکات | فرانسوی | دوومیدانی | شیمی
+
+تنها تفاوت دو جواب، جابه‌جایی زبان ایتالیایی و ژاپنی بین جورج و ویکتور است.`
+      },
+      2: {
+        title: "دانشمندان فیزیک",
+        answer: `دانشمند | سن | غذا | موضوع پژوهش
+کریستوفر | ۴۲ | ماهی | رسانش گرمایی
+دونالد | ۳۸ | غذای مکزیکی | انتقال گرما
+اوون | ۴۰ | میگو | گذارهای فازی
+ظفر | ۳۴ | گوشت گاو | گرمای ویژه
+لیام | ۳۶ | تاکوی مرغ | آنتروپی`
+      }
+    };
+
+    const params = new URLSearchParams(window.location.search);
+    const id = parseInt(params.get("p"), 10) || 1;
+    const puzzle = puzzles[id];
+
+    const titleEl = document.getElementById("puzzle-title");
+    const answerEl = document.getElementById("puzzle-answer");
+    const navEl = document.getElementById("puzzle-nav");
+    const btnEl = document.getElementById("toggle-btn");
+
+    if (puzzle) {
+      document.title = puzzle.title;
+      titleEl.textContent = puzzle.title;
+      answerEl.textContent = puzzle.answer;
+
+      let navHtml = "";
+      if (puzzles[id - 1]) navHtml += `<a href="?p=${id - 1}">← معمای قبلی</a>`;
+      if (puzzles[id + 1]) navHtml += `<a href="?p=${id + 1}">معمای بعدی →</a>`;
+      navEl.innerHTML = navHtml;
+    } else {
+      titleEl.textContent = "معمایی با این شماره پیدا نشد";
+      btnEl.style.display = "none";
+      navEl.innerHTML = `<a href="?p=1">بازگشت به معمای ۱</a>`;
+    }
+
+    function toggleAnswer() {
+      const isShown = answerEl.classList.toggle("show");
+      btnEl.textContent = isShown ? "مخفی کردن جواب" : "نمایش جواب";
+    }
+  </script>
+</body>
+</html>
