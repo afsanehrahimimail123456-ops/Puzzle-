@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>فهرست معماها و پاسخ‌ها</title>
+  <style>
+    * { box-sizing: border-box; font-family: Tahoma, sans-serif; }
+    body {
+      margin: 0;
+      padding: 20px;
+      background: #f7f8fa;
+      color: #1f2937;
+      line-height: 1.7;
+    }
+    .container {
+      max-width: 720px;
+      margin: 0 auto;
+      background: #ffffff;
+      border-radius: 14px;
+      padding: 20px;
+      box-shadow: 0 4px 18px rgba(0, 0, 0, 0.06);
+    }
+    h1 {
+      margin-top: 0;
+      font-size: 1.35rem;
+      text-align: center;
+      color: #111827;
+    }
+    .search-box {
+      width: 100%;
+      padding: 11px 14px;
+      border: 1px solid #d1d5db;
+      border-radius: 10px;
+      font-size: 0.95rem;
+      margin-bottom: 16px;
+    }
+    .puzzle-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: grid;
+      gap: 10px;
+    }
+    .puzzle-btn {
+      width: 100%;
+      text-align: right;
+      background: #f3f4f6;
+      border: 1px solid #e5e7eb;
+      border-radius: 10px;
+      padding: 12px 14px;
+      font-size: 0.98rem;
+      cursor: pointer;
+      color: #111827;
+      transition: background 0.15s ease;
+    }
+    .puzzle-btn:hover {
+      background: #e5e7eb;
+    }
+    .answer-box {
+      display: none;
+    }
+    .back-btn {
+      background: #111827;
+      color: #ffffff;
+      border: none;
+      border-radius: 10px;
+      padding: 10px 16px;
+      font-size: 0.95rem;
+      cursor: pointer;
+      margin-bottom: 16px;
+    }
+    .answer-content {
+      background: #f9fafb;
+      border: 1px solid #e5e7eb;
+      border-radius: 10px;
+      padding: 16px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+      background: #ffffff;
+    }
+    th, td {
+      border: 1px solid #d1d5db;
+      padding: 8px;
+      text-align: center;
+      font-size: 0.9rem;
+    }
+    th {
+      background: #eef2ff;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- بخش لیست معماها -->
+    <div id="listView">
+      <h1>فهرست معماها</h1>
+      <input
+        type="text"
+        id="searchInput"
+        class="search-box"
+        placeholder="جست‌وجو در عنوان معماها..."
+      />
+      <ul id="puzzleList" class="puzzle-list"></ul>
+    </div>
+
+    <!-- بخش نمایش پاسخ -->
+    <div id="answerView" class="answer-box">
+      <button id="backBtn" class="back-btn">← بازگشت به لیست</button>
+      <div id="answerContent" class="answer-content"></div>
+    </div>
+  </div>
+
+  <script>
+    const totalPuzzles = 60;
+    const puzzles = Array.from({ length: totalPuzzles }, (_, index) => {
+      const num = index + 1;
+      return {
+        id: num,
+        title: `معما ${num}`,
+        answerHtml: `
+          <h2>جواب معما ${num}</h2>
+          <p>محتوای پاسخ معما ${num} در این بخش قرار می‌گیرد.</p>
+        `
+      };
+    });
+
+    const listView = document.getElementById("listView");
+    const answerView = document.getElementById("answerView");
+    const puzzleListEl = document.getElementById("puzzleList");
+    const answerContentEl = document.getElementById("answerContent");
+    const backBtn = document.getElementById("backBtn");
+    const searchInput = document.getElementById("searchInput");
+
+    let activePuzzleId = null;
+
+    function renderList(filterText = "") {
+      const q = filterText.trim();
+      puzzleListEl.innerHTML = "";
+
+      const filtered = puzzles.filter(p => p.title.includes(q));
+      filtered.forEach(p => {
+        const li = document.createElement("li");
+        const btn = document.createElement("button");
+        btn.className = "puzzle-btn";
+        btn.textContent = p.title;
+
+        // کلیک اول جواب را نشان می‌دهد؛ کلیک دوباره روی همان معما به لیست برمی‌گرداند
+        btn.addEventListener("click", () => {
+          if (activePuzzleId === p.id) {
+            showList();
+          } else {
+            showAnswer(p.id);
+          }
+        });
+
+        li.appendChild(btn);
+        puzzleListEl.appendChild(li);
+      });
+    }
+
+    function showAnswer(id) {
+      const puzzle = puzzles.find(item => item.id === id);
+      if (!puzzle) return;
+
+      activePuzzleId = id;
+      answerContentEl.innerHTML = puzzle.answerHtml;
+      listView.style.display = "none";
+      answerView.style.display = "block";
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function showList() {
+      activePuzzleId = null;
+      answerView.style.display = "none";
+      listView.style.display = "block";
+    }
+
+    backBtn.addEventListener("click", showList);
+
+    searchInput.addEventListener("input", (e) => {
+      renderList(e.target.value);
+    });
+
+    // اگر لینک با ?p=1 تا ?p=60 باز شود، مستقیم همان معما را نشان می‌دهد
+    const params = new URLSearchParams(window.location.search);
+    const initialId = Number(params.get("p"));
+    renderList();
+    if (initialId && puzzles.some(p => p.id === initialId)) {
+      showAnswer(initialId);
+    }
+  </script>
+</body>
+</html>
